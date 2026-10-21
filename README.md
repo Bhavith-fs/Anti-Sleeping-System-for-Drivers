@@ -7,7 +7,7 @@ A computer vision-based driver drowsiness detection system that monitors eye clo
 🎯 **Focus:** Detect • Monitor • Alert • Protect
 
 🌐 **Live Demo:**  
-👉 https://resumeranker-alpha.vercel.app/
+👉 https://bhavith-fs.github.io/Anti-Sleeping-System-for-Drivers/
 
 ![Driver Safety](https://img.shields.io/badge/Driver%20Safety-Accident%20Prevention-blue?style=for-the-badge)
 ![Computer Vision](https://img.shields.io/badge/Computer%20Vision-MediaPipe-purple?style=for-the-badge)
