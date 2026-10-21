@@ -488,16 +488,6 @@ Cybersecurity & Network Security Enthusiast
 
 ---
 
-## 📄 Project Status
-
-**Phase 2 — Real-Time Monitoring and Hardware Integration**
-
-The project includes webcam-based eye monitoring, EAR-based detection, calibration, state management, a live monitoring interface, and Web Serial API communication with an STM32 microcontroller.
-
-Hardware alerts depend on the correct circuit connections and compatible STM32 firmware. The project is intended for educational and prototyping purposes, and implementation details may evolve as testing progresses.
-
----
-
 <div align="center">
 
 **Designed and created by Bhavith Madhav**
