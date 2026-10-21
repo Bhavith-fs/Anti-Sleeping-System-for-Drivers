@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Sleep Alarm System for Drivers</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Screen 1: Intro -->
+    <div id="intro-screen" class="screen">
+        <div class="intro-content">
+            <div class="eye-icon">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="50" cy="50" rx="35" ry="25" stroke="#00B4D8" stroke-width="3" fill="none"/>
+                    <circle cx="50" cy="50" r="12" fill="#00B4D8"/>
+                    <circle cx="50" cy="50" r="5" fill="#0D1B2A"/>
+                </svg>
+            </div>
+            <h1>ANTI-SLEEP ALARM SYSTEM FOR DRIVERS</h1>
+            <p class="subtitle">A Computer Vision and STM32 Based Driver Drowsiness Detection System</p>
+            <a href="#" id="skip-intro" class="skip-link">Skip</a>
+        </div>
+    </div>
+
+    <!-- Compatibility Banner -->
+    <div id="compatibility-banner" class="compatibility-banner hidden">
+        <p>Please use Google Chrome or Microsoft Edge on desktop for Web Serial API support.</p>
+    </div>
+
+    <!-- Screen 2: Live Monitor -->
+    <div id="monitor-screen" class="screen hidden">
+        <div class="monitor-container">
+            <!-- Header with Connect Button -->
+            <div class="monitor-header">
+                <h2>Live Monitor</h2>
+                <button id="btn-connect" class="btn btn-primary" aria-label="Connect to serial device">Connect Device</button>
+            </div>
+            
+            <div class="main-panel">
+                <!-- Video Panel -->
+                <div class="video-panel">
+                    <div class="video-container">
+                        <video id="webcam" autoplay playsinline muted></video>
+                        <canvas id="overlay"></canvas>
+                        <div id="loading-overlay" class="loading-overlay">
+                            <div class="spinner"></div>
+                            <p>Loading MediaPipe model...</p>
+                        </div>
+                        <div id="error-overlay" class="error-overlay hidden">
+                            <p id="error-message"></p>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button id="btn-start" class="btn btn-primary">Start Camera</button>
+                        <button id="btn-stop" class="btn btn-secondary" disabled>Stop Camera</button>
+                        <button id="btn-calibrate" class="btn btn-accent" disabled>Calibrate</button>
+                    </div>
+                </div>
+
+                <!-- Status Panel -->
+                <div class="status-panel">
+                    <!-- Status Banner -->
+                    <div id="status-banner" class="status-banner awake">
+                        <span id="status-text">Driver is Normal / Awake</span>
+                    </div>
+
+                    <!-- Eye Closure Meter -->
+                    <div class="meter-card">
+                        <h3>Eye Closure</h3>
+                        <div class="meter-container">
+                            <div class="meter-bar">
+                                <div id="closure-bar" class="meter-fill" style="width: 0%"></div>
+                                <div id="threshold-marker" class="threshold-marker" style="left: 50%"></div>
+                            </div>
+                            <span id="closure-value" class="meter-value">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Timers -->
+                    <div class="timers-card">
+                        <div class="timer-item">
+                            <span class="timer-label">Eyes closed:</span>
+                            <span id="closed-timer" class="timer-value">0.0 / 3.0 s</span>
+                        </div>
+                        <div class="timer-item">
+                            <span class="timer-label">Eyes open:</span>
+                            <span id="open-timer" class="timer-value">0.0 / 3.0 s</span>
+                        </div>
+                    </div>
+
+                    <!-- Small Info Cards -->
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <span class="info-label">Left Eye</span>
+                            <span id="left-eye" class="info-value">--</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Right Eye</span>
+                            <span id="right-eye" class="info-value">--</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">FPS</span>
+                            <span id="fps" class="info-value">--</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Face</span>
+                            <span id="face-detected" class="info-value">No</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Last Change</span>
+                            <span id="last-change" class="info-value">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Device Status -->
+                    <div class="device-card">
+                        <span class="device-label">Device:</span>
+                        <span id="device-status" class="device-value">Not connected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Panel -->
+            <div class="bottom-panel">
+                <!-- Settings -->
+                <div class="settings-section">
+                    <button id="btn-settings" class="btn btn-small">Settings</button>
+                    <div id="settings-drawer" class="settings-drawer hidden">
+                        <div class="setting-item">
+                            <label for="threshold-input">Closure Threshold (%):</label>
+                            <input type="number" id="threshold-input" value="50" min="1" max="100">
+                        </div>
+                        <div class="setting-item">
+                            <label for="close-hold-input">Close Hold (s):</label>
+                            <input type="number" id="close-hold-input" value="3.0" min="0.5" max="10" step="0.1">
+                        </div>
+                        <div class="setting-item">
+                            <label for="recover-hold-input">Recover Hold (s):</label>
+                            <input type="number" id="recover-hold-input" value="3.0" min="0.5" max="10" step="0.1">
+                        </div>
+                        <div class="setting-item">
+                            <label for="beep-toggle">
+                                <input type="checkbox" id="beep-toggle">
+                                Browser beep in SLEEP state
+                            </label>
+                        </div>
+                        <button id="btn-apply-settings" class="btn btn-small">Apply</button>
+                    </div>
+                </div>
+
+                <!-- Test Panel -->
+                <div class="test-section">
+                    <button id="btn-sim-awake" class="btn btn-small btn-success" aria-label="Simulate awake state">Simulate Awake</button>
+                    <button id="btn-sim-sleep" class="btn btn-small btn-danger" aria-label="Simulate sleep state">Simulate Sleep</button>
+                </div>
+
+                <!-- Hardware Test Panel -->
+                <div class="hardware-test-section">
+                    <button id="btn-hardware-test" class="btn btn-small">Hardware Test</button>
+                    <div id="hardware-test-drawer" class="hardware-test-drawer hidden">
+                        <div class="hardware-test-buttons">
+                            <button id="btn-send-a" class="btn btn-small btn-success">Send A</button>
+                            <button id="btn-send-s" class="btn btn-small btn-danger">Send S</button>
+                        </div>
+                        <div class="hardware-test-warning hidden" id="hardware-warning">
+                            <p>⚠️ Manual sends are temporary and will be overwritten by the next detected state change.</p>
+                        </div>
+                        <div class="hardware-test-info">
+                            <span class="info-label">Last byte sent:</span>
+                            <span id="last-byte-sent" class="info-value">--</span>
+                            <span id="last-byte-time" class="info-time">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Log -->
+                <div class="log-section">
+                    <h3>Event Log</h3>
+                    <div id="event-log" class="event-log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MediaPipe Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    
+    <!-- Application Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
